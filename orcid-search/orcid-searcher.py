@@ -1,6 +1,7 @@
 import grequests
 import csv
 import time
+import sys
 from oauthlib.oauth2 import BackendApplicationClient
 from requests_oauthlib import OAuth2Session
 from requests.auth import HTTPBasicAuth
@@ -80,19 +81,17 @@ class OrcidSearcher:
 
 
 if __name__ == '__main__':
-    startfrom = 110436
+    startfrom = int(sys.argv[2])
     counter = 0
 
-    with open('articles-88.tsv', 'r') as csvfiletoread:
-        spamreader = csv.reader(csvfiletoread, delimiter='\t', quotechar='|')
-        with open('results/88-orcid-full-8.tsv', 'w') as csvfile:
-            writer = csv.writer(csvfile, delimiter='\t',
-                                quotechar='|', quoting=csv.QUOTE_MINIMAL)
+    with open(sys.argv[1], 'r') as csvfiletoread:
+        spamreader = csv.reader(csvfiletoread, delimiter=',', quotechar='|')
+        with open('results/'+sys.argv[1], 'w') as csvfile:
+            writer = csv.writer(csvfile, delimiter=',', quoting=csv.QUOTE_MINIMAL)
             searcher = OrcidSearcher('aa986fc3-621f-4822-8346-2e0ee20108ef', writer)
             for row in spamreader:
                 counter += 1
                 if counter >=startfrom:
-                    if len(row) > 3:
-                        if row[3]:
-                            searcher.search(row[0], row[3])
-                            print("Completed: " + str(counter))
+                    if len(row)>1:
+                        searcher.search(row[0], row[1])
+                        print("Completed: " + str(counter))
